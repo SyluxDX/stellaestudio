@@ -2,7 +2,8 @@ package sqlite
 
 import (
 	"database/sql"
-
+	// To import a package solely for its side-effects (initialization), use the
+	// blank identifier as explicit package name
 	_ "github.com/mattn/go-sqlite3"
 )
 
