@@ -8,14 +8,14 @@ CREATE TABLE professors (
 );
 
 CREATE TABLE classes (
-  idclas INTEGER PRIMARY KEY,
+  id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
   weekday INTEGER NOT NULL,
   time TEXT NOT NULL,
   professor_id INTEGER NOT NULL,
   active INTEGER NOT NULL,
   FOREIGN KEY(professor_id)
-    REFERENCES professors(idclas)
+    REFERENCES professors(id)
 );
 
 CREATE TABLE students (
