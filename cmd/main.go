@@ -1,18 +1,21 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 
-	// To import a package solely for its side-effects (initialization), use the
-	// blank identifier as explicit package name
-	// _ "github.com/mattn/go-sqlite3"
 	"stellaeestudio/cmd/sqlite"
 )
 
 func main() {
-	log.Println("Connect to db")
-	conn, err := sqlite.Open("./stellae.db")
+	// command line flags
+	var databaseFilepath string
+	flag.StringVar(&databaseFilepath, "db", "./stellae.db", "Path to sqlite3 database.")
+	flag.Parse()
+
+	log.Printf("Connect to db %s\n", databaseFilepath)
+	conn, err := sqlite.Open(databaseFilepath)
 	if err != nil {
 		log.Panicln(err)
 	}
