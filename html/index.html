@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<form class="form-horizontal" action="studentinfo" method="post">
+    <fieldset>
+        <!-- Form Name -->
+        <legend>Search Student</legend>
+
+        <!-- Select Basic -->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="selectbasic">Select Name</label>
+            <div class="col-md-4">
+                <select id="selectbasic" name="studentid" class="form-control">
+                    <option disabled selected value> -- select an option -- </option>
+                    {{range .}}
+                    <option value={{.Id}}>{{.Name}}</option>>
+                    {{end}}
+                </select>
+            </div>
+        </div>
+
+        <!-- Button -->
+        <div class="form-group">
+            <br>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+
+    </fieldset>
+</form>
+
+</html>

@@ -2,6 +2,8 @@ package sqlite
 
 import (
 	"database/sql"
+	"fmt"
+
 	// To import a package solely for its side-effects (initialization), use the
 	// blank identifier as explicit package name
 	_ "github.com/mattn/go-sqlite3"
@@ -29,6 +31,11 @@ type Student struct {
 	Email       sql.NullString
 	Nif         int
 	Active      bool
+}
+
+type StudentName struct {
+	Id   int
+	Name string
 }
 
 type ClassOcupancy struct {
@@ -114,6 +121,58 @@ func GetStudents(dbConn *sql.DB) ([]Student, error) {
 			&row.Email,
 			&row.Nif,
 			&row.Active,
+		)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, row)
+	}
+	return data, nil
+}
+
+func GetStudentById(dbConn *sql.DB, id string) (*Student, error) {
+	query := fmt.Sprintf("SELECT id, name, phone_number, email, nif, active FROM students where id=%s;", id)
+	fmt.Println(query)
+	rows, err := dbConn.Query(query)
+	if err != nil {
+		fmt.Println("Error connection query")
+		return nil, err
+	}
+	defer rows.Close()
+
+	var data Student
+	for rows.Next() {
+		var row Student
+		err = rows.Scan(
+			&row.Id,
+			&row.Name,
+			&row.PhoneNumber,
+			&row.Email,
+			&row.Nif,
+			&row.Active,
+		)
+		if err != nil {
+			return nil, err
+		}
+		data = row
+	}
+	return &data, nil
+}
+
+func GetStudentsNames(dbConn *sql.DB) ([]StudentName, error) {
+	query := "SELECT id, name FROM students;"
+	rows, err := dbConn.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var data []StudentName
+	for rows.Next() {
+		var row StudentName
+		err = rows.Scan(
+			&row.Id,
+			&row.Name,
 		)
 		if err != nil {
 			return nil, err
