@@ -36,3 +36,16 @@ CREATE TABLE class_ocupancy (
   FOREIGN KEY (student_id)
     REFERENCES students (id)
 );
+
+-- internal configurations
+CREATE TABLE subscription (
+  id INTEGER PRIMARY KEY,
+  value INTEGER,
+  name TEXT NOT NULL
+);
+
+CREATE TABLE promo (
+  id INTEGER PRIMARY KEY,
+  value INTEGER,
+  name TEXT NOT NULL
+);

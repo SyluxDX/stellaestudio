@@ -43,6 +43,18 @@ type ClassOcupancy struct {
 	StudentId int
 }
 
+type Subscription struct {
+	Id    int
+	Name  string
+	Value int
+}
+
+type Promotion struct {
+	Id    int
+	Name  string
+	Value int
+}
+
 // Open opens the sqlite database, requires a string with
 // the path to the sqlite db file and retuns:
 //
@@ -132,7 +144,6 @@ func GetStudents(dbConn *sql.DB) ([]Student, error) {
 
 func GetStudentById(dbConn *sql.DB, id string) (*Student, error) {
 	query := fmt.Sprintf("SELECT id, name, phone_number, email, nif, active FROM students where id=%s;", id)
-	fmt.Println(query)
 	rows, err := dbConn.Query(query)
 	if err != nil {
 		fmt.Println("Error connection query")
@@ -196,6 +207,53 @@ func GetClassOcupancy(dbConn *sql.DB) ([]ClassOcupancy, error) {
 		err = rows.Scan(
 			&row.ClassId,
 			&row.StudentId,
+		)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, row)
+	}
+	return data, nil
+}
+
+func GetSubscriptions(dbConn *sql.DB) ([]Subscription, error) {
+	query := "SELECT id, name, value FROM subscription;"
+	rows, err := dbConn.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var data []Subscription
+	for rows.Next() {
+		var row Subscription
+		err = rows.Scan(
+			&row.Id,
+			&row.Name,
+			&row.Value,
+		)
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, row)
+	}
+	return data, nil
+}
+func GetPromos(dbConn *sql.DB) ([]Promotion, error) {
+	query := "SELECT id, name, value FROM promo;"
+	rows, err := dbConn.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var data []Promotion
+	for rows.Next() {
+		var row Promotion
+		err = rows.Scan(
+			&row.Id,
+			&row.Name,
+			&row.Value,
 		)
 		if err != nil {
 			return nil, err

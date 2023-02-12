@@ -10,8 +10,6 @@ import (
 	"net/http"
 
 	"stellaeestudio/cmd/sqlite"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 // func debug() {
@@ -59,12 +57,29 @@ import (
 // 	fmt.Printf("%+v\n", ocpu)
 // }
 
+// type formData struct {
+// }
+
+type StudentDetail struct {
+	Name string
+	NIF  string
+}
+
+type formInfo struct {
+	StudentsNames []sqlite.StudentName
+	Subscriptions []sqlite.Subscription
+	Promotions    []sqlite.Promotion
+	Detail        StudentDetail
+}
+
 var (
-	DBConn *sql.DB
+	DBConn   *sql.DB
+	FormInfo formInfo
 )
 
 func searchHandler(students []sqlite.StudentName) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Search handler hit")
 		templatePage, err := template.ParseFiles("html/index.html")
 		if err != nil {
 			fmt.Println(err)
@@ -78,19 +93,66 @@ func searchHandler(students []sqlite.StudentName) http.HandlerFunc {
 	}
 }
 
-func getStudentInfo(w http.ResponseWriter, req *http.Request) {
+func searchFormHandler(w http.ResponseWriter, req *http.Request) {
+	log.Println("Form Search handler hit")
+
+	// get student info
 	req.ParseForm()
 	id := req.Form["studentid"][0]
+	student, _ := sqlite.GetStudentById(DBConn, id)
+
+	detail := StudentDetail{Name: student.Name, NIF: fmt.Sprint(student.Nif)}
+
+	FormInfo.Detail = detail
+	templatePage, err := template.ParseFiles("html/index.html")
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := templatePage.Execute(w, FormInfo); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func getStudentInfo(w http.ResponseWriter, req *http.Request) {
+	log.Println("Endpoint Hit: students")
+	// var bodyBytes []byte
+
+	// bodyBytes, _ = io.ReadAll(req.Body)
+	// // defer req.Body.Close()
+	// fmt.Println("body", string(bodyBytes))
+
+	// req.ParseForm()
 	// for key, value := range req.Form {
 	// 	fmt.Printf("%s = %s\n", key, value)
 	// }
+
+	req.ParseForm()
+	id := req.Form["studentid"][0]
 	student, _ := sqlite.GetStudentById(DBConn, id)
 	fmt.Println(student)
 
 	// write output
 	w.Header().Add("Content-Type", "application/json")
-	log.Println("Endpoint Hit: students")
 	json.NewEncoder(w).Encode(student)
+}
+
+func serveForm(w http.ResponseWriter, req *http.Request) {
+	log.Println("Endpoint Hit: Serve Form")
+	log.Println(req.Method)
+	templatePage, err := template.ParseFiles("html/form.html")
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := templatePage.Execute(w, FormInfo); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
 }
 
 func main() {
@@ -100,36 +162,44 @@ func main() {
 	flag.Parse()
 
 	log.Printf("Connect to db %s\n", databaseFilepath)
+	var err error
 	// conn, err := sqlite.Open(databaseFilepath)
-	Conn, err := sqlite.Open(databaseFilepath)
+	DBConn, err = sqlite.Open(databaseFilepath)
 	if err != nil {
 		log.Panicln(err)
 	}
-	DBConn = Conn
+
 	defer DBConn.Close()
 
-	studs, err := sqlite.GetStudentsNames(Conn)
+	FormInfo.StudentsNames, err = sqlite.GetStudentsNames(DBConn)
 	if err != nil {
 		log.Panicln(err)
 	}
 
-	id := "5"
-	student, _ := sqlite.GetStudentById(Conn, id)
-	fmt.Println(student)
-	fmt.Println()
-	fmt.Println("Conn", Conn)
+	FormInfo.Subscriptions, err = sqlite.GetSubscriptions(DBConn)
+	if err != nil {
+		log.Panicln(err)
+	}
 
-	// Server Configurations
-	// http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	// 	http.ServeFile(w, r, "html/index.html")
-	// })
-	// http.HandleFunc("/confirm", uploadFiles)
-	http.HandleFunc("/", searchHandler(studs))
+	FormInfo.Promotions, err = sqlite.GetPromos(DBConn)
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	// use handler to send variable to http function
+	http.HandleFunc("/", searchHandler(FormInfo.StudentsNames))
+
+	// use global variables to send variable to http function
+	http.HandleFunc("/form", serveForm)
+
+	// set favivon.ico
+	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {})
 	http.HandleFunc("/studentinfo", getStudentInfo)
 
+	// Server Configurations
 	server := "localhost"
 	port := 8080
-
+	// start server
 	log.Printf("Serving on %[1]s port %[2]d (http://%[1]s:%[2]d/)\n", server, port)
 	http.ListenAndServe(fmt.Sprintf("%s:%d", server, port), nil)
 }

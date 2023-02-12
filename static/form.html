@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+  .row:after {
+    content: "";
+    display: table;
+    clear: both;
+    margin-bottom: 2px;
+  }
+
+  .column-left {
+    width: 20%;
+    float: left;
+  }
+
+  .column-right {
+    width: 80%;
+    float: right;
+  }
+
+  .space {
+    margin-top: 10px;
+  }
+
+  .checkbox {
+    margin-left: 5px;
+  }
+
+  .form-button {
+    margin: 10px;
+  }
+</style>
+
+<form id="search-form" action="studentinfo" method="post">
+  <fieldset>
+    <legend>Search Student</legend>
+    <div class="form-group">
+      <label for="selectbasic">Select Name</label>
+      <div>
+        <select id="selectbasic" name="studentid">
+          <option disabled selected value> -- select an option -- </option>
+          <option value=1>Ana Mirtilo</option>>
+          <option value=2>Maria Inês</option>>
+          <option value=3>Joana Gomes de Mello</option>>
+          <option value=4>Diana Silva</option>>
+          <option value=5>Carolina Esteves</option>>
+          <option value=6>Filipa Madeira</option>>
+          <option value=7>Rita Maria Castelo</option>>
+          <option value=8>Teresa Pessoa</option>>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <br>
+      <div>
+        <button type="submit">Search</button>
+      </div>
+    </div>
+  </fieldset>
+</form>
+
+<br><br>
+
+<form class="form-horizontal" action="parseform" method="post">
+  <fieldset>
+
+    <!-- Form Name -->
+    <legend>Form Name</legend>
+	<input type="hidden" id="studentId" value="3487">
+
+    <!-- Text input-->
+    <div class="row">
+      <div class="column-left">
+        <label>Name</label>
+      </div>
+      <div class="column-right">
+        <input id="name-textinput" name="name" type="text" placeholder="placeholder">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column-left">
+        <label>Date of birth</label>
+      </div>
+      <div class="column-right">
+        <input id="dob-textinput" name="dob" type="date">
+        <!-- <input id="dob-textinput" name="dob" type="text" placeholder="placeholder"> -->
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column-left">
+        <label>NIF</label>
+      </div>
+      <div class="column-right">
+        <input id="nif-textinput" name="nif" type="text" placeholder="placeholder">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column-left">
+        <label>Health Problems</label>
+      </div>
+      <div class="column-right">
+        <input id="health-textinput" name="health" type="text" placeholder="placeholder">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column-left">
+        <label>Inscription Year</label>
+      </div>
+      <div class="column-right">
+        <input id="year-textinput" name="year" type="text" placeholder="placeholder">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column-left">
+        <label>Subscription</label>
+      </div>
+      <div class="column-right">
+        <select id=subscription-selectinput name=subscription>
+          <option disabled selected value> -- select an option -- </option>
+          <option value=1>1 aulas por semana </option>
+          <option value=2>2 aulas por semana </option>
+          <option value=3>3 aulas por semana </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column-left">
+        <label>Promo</label>
+      </div>
+      <div class="column-right">
+        <select id="promo" name="promo">
+          <option disabled selected value> -- select an option -- </option>
+          <option value=1>No Promo</option>
+          <option value=2>Half month</option>
+          <option value=3>Family</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column-left">
+        <label>Active</label>
+      </div>
+      <div class="column-right">
+        <input type="checkbox" name="active" id="active" value=1>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column-left">
+        <label>Montly fee</label>
+      </div>
+      <div class="column-right">
+        <input id="fee-textinput" name="fee" type="text" disabled value="0.00€">
+      </div>
+    </div>
+
+    <div class="row space">
+      <label>Classes</label>
+      <div class="checkbox">
+        <input type="checkbox" name="classes" value=1>
+        <label>Yoga</label>
+      </div>
+      <div class="checkbox">
+        <input type="checkbox" name="classes" value=2>
+        <label>Pilates</label>
+      </div>
+      <div class="checkbox">
+        <input type="checkbox" name="classes" value=3>
+        <label>Dance</label>
+      </div>
+    </div>
+    <div class="space">
+      <button class="form-button" type="submit">Update</button>
+      <button class="form-button" type="reset">Clear/Reset</button>
+    </div>
+
+  </fieldset>
+</form>
+
+<script>
+  resetForms = function () {
+    document.getElementById("detail-form").reset();
+    document.getElementById("search-form").reset();
+  }
+</script>
+
+</html>

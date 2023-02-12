@@ -54,3 +54,16 @@ VALUES
 (6, 7),
 (6, 4),
 (6, 1);
+
+-- internal configurations
+INSERT INTO subscription (value, name)
+VALUES
+(25, "1 class per week"),
+(35, "2 class per week"),
+(45, "3 class per week");
+
+INSERT INTO promo (value, name)
+VALUES
+(0, "No Promo"),
+(50, "Half Month"),
+(25, "Family");
