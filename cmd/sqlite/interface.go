@@ -25,12 +25,17 @@ type Class struct {
 }
 
 type Student struct {
-	Id          int
-	Name        string
-	PhoneNumber sql.NullString
-	Email       sql.NullString
-	Nif         int
-	Active      bool
+	Id           int
+	Name         string
+	PhoneNumber  sql.NullInt64
+	Email        sql.NullString
+	Nif          int
+	Health       string
+	Year         int
+	Subscription int
+	Promo        int
+	Active       bool
+	Fee          float64
 }
 
 type StudentName struct {
@@ -132,7 +137,12 @@ func GetStudents(dbConn *sql.DB) ([]Student, error) {
 			&row.PhoneNumber,
 			&row.Email,
 			&row.Nif,
+			&row.Health,
+			&row.Year,
+			&row.Subscription,
+			&row.Promo,
 			&row.Active,
+			&row.Fee,
 		)
 		if err != nil {
 			return nil, err
@@ -143,7 +153,7 @@ func GetStudents(dbConn *sql.DB) ([]Student, error) {
 }
 
 func GetStudentById(dbConn *sql.DB, id string) (*Student, error) {
-	query := fmt.Sprintf("SELECT id, name, phone_number, email, nif, active FROM students where id=%s;", id)
+	query := fmt.Sprintf("SELECT id, name, phone_number, email, nif, health, year, subscription, promo, active, fee FROM students where id=%s;", id)
 	rows, err := dbConn.Query(query)
 	if err != nil {
 		fmt.Println("Error connection query")
@@ -160,7 +170,12 @@ func GetStudentById(dbConn *sql.DB, id string) (*Student, error) {
 			&row.PhoneNumber,
 			&row.Email,
 			&row.Nif,
+			&row.Health,
+			&row.Year,
+			&row.Subscription,
+			&row.Promo,
 			&row.Active,
+			&row.Fee,
 		)
 		if err != nil {
 			return nil, err

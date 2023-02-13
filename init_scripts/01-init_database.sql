@@ -21,10 +21,15 @@ CREATE TABLE classes (
 CREATE TABLE students (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
-  phone_number TEXT,
+  phone_number INTEGER,
   email TEXT,
   nif INTEGER NOT NULL,
-  active INTEGER NOT NULL
+  health TEXT,
+  year INTEGER NOT NULL,
+  subscription INTEGER NOT NULL,
+  promo INTEGER NOT NULL,
+  active INTEGER NOT NULL,
+  fee DOUBLE NOT NULL
 );
 
 CREATE TABLE class_ocupancy (

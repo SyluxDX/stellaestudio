@@ -93,28 +93,50 @@ func searchHandler(students []sqlite.StudentName) http.HandlerFunc {
 	}
 }
 
-func searchFormHandler(w http.ResponseWriter, req *http.Request) {
-	log.Println("Form Search handler hit")
+func searchFormHandler(data formInfo) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Form Search handler hit")
+		templatePage, err := template.ParseFiles("html/form.html")
+		if err != nil {
+			fmt.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-	// get student info
-	req.ParseForm()
-	id := req.Form["studentid"][0]
-	student, _ := sqlite.GetStudentById(DBConn, id)
-
-	detail := StudentDetail{Name: student.Name, NIF: fmt.Sprint(student.Nif)}
-
-	FormInfo.Detail = detail
-	templatePage, err := template.ParseFiles("html/index.html")
-	if err != nil {
-		fmt.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if err := templatePage.Execute(w, FormInfo); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err := templatePage.Execute(w, data); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
+func parseForm(w http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
+	for key, value := range req.Form {
+		fmt.Printf("%s = %s\n", key, value)
+	}
+}
+
+// func searchFormHandler(w http.ResponseWriter, req *http.Request) {
+// 	log.Println("Form Search handler hit")
+
+// 	// get student info
+// 	req.ParseForm()
+// 	id := req.Form["studentid"][0]
+// 	student, _ := sqlite.GetStudentById(DBConn, id)
+
+// 	detail := StudentDetail{Name: student.Name, NIF: fmt.Sprint(student.Nif)}
+
+// 	FormInfo.Detail = detail
+// 	templatePage, err := template.ParseFiles("html/index.html")
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 		return
+// 	}
+
+// 	if err := templatePage.Execute(w, FormInfo); err != nil {
+// 		http.Error(w, err.Error(), http.StatusInternalServerError)
+// 	}
+// }
 
 func getStudentInfo(w http.ResponseWriter, req *http.Request) {
 	log.Println("Endpoint Hit: students")
@@ -186,15 +208,19 @@ func main() {
 		log.Panicln(err)
 	}
 
+	data, _ := json.MarshalIndent(FormInfo, "", " ")
+	fmt.Println(string(data))
+
 	// use handler to send variable to http function
 	http.HandleFunc("/", searchHandler(FormInfo.StudentsNames))
 
 	// use global variables to send variable to http function
-	http.HandleFunc("/form", serveForm)
+	http.HandleFunc("/form", searchFormHandler(FormInfo))
 
 	// set favivon.ico
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {})
 	http.HandleFunc("/studentinfo", getStudentInfo)
+	http.HandleFunc("/parseForm", parseForm)
 
 	// Server Configurations
 	server := "localhost"

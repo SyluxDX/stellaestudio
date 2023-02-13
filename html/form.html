@@ -31,7 +31,8 @@
   }
 </style>
 
-<form id="search-form" action="studentinfo" method="post">
+<!-- <form id="search-form" action="studentinfo" method="post"> -->
+<form id="search-form">
   <fieldset>
     <legend>Search Student</legend>
     <div class="form-group">
@@ -48,7 +49,8 @@
     <div class="form-group">
       <br>
       <div>
-        <button type="submit">Search</button>
+        <!-- <button type="submit" onclick="callApi()">Search</button> -->
+        <button type="button" onclick="callApi()">Search</button>
       </div>
     </div>
   </fieldset>
@@ -56,20 +58,19 @@
 
 <br><br>
 
-<form class="form-horizontal" action="form" method="post">
-<!-- <form class="form-horizontal" action="parseform" method="post"> -->
+<form id="detail-form" action="parseForm" method="post">
   <fieldset>
 
     <!-- Form Name -->
     <legend>Form Name</legend>
-    <input type="hidden" id="studentId" name="studentId" value="3487">
+    <input type="hidden" id="studentId-field" name="studentId" value="">
     <!-- Text input-->
     <div class="row">
       <div class="column-left">
         <label>Name</label>
       </div>
       <div class="column-right">
-        <input id="name-textinput" name="name" type="text" placeholder={{.Detail.Name}}>
+        <input id="name-textinput" name="name" type="text" placeholder="">
       </div>
     </div>
 
@@ -78,8 +79,26 @@
         <label>Date of birth</label>
       </div>
       <div class="column-right">
-        <input id="dob-textinput" name="dob" type="date">
+        <input id="dob-textinput" name="dob" type="date" placeholder="">
         <!-- <input id="dob-textinput" name="dob" type="text" placeholder="placeholder"> -->
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column-left">
+        <label>Phone Number</label>
+      </div>
+      <div class="column-right">
+        <input id="phone-textinput" name="nif" type="text" placeholder="">
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="column-left">
+        <label>Email</label>
+      </div>
+      <div class="column-right">
+        <input id="email-textinput" name="nif" type="text" placeholder="">
       </div>
     </div>
 
@@ -88,7 +107,7 @@
         <label>NIF</label>
       </div>
       <div class="column-right">
-        <input id="nif-textinput" name="nif" type="text" placeholder={{.Detail.NIF}}>
+        <input id="nif-textinput" name="nif" type="text" placeholder="">
       </div>
     </div>
 
@@ -115,7 +134,7 @@
         <label>Subscription</label>
       </div>
       <div class="column-right">
-        <select id=subscription-selectinput name=subscription>
+        <select id=subscription-selectinput name=subscription onchange="updateFeeValue()">
           <option disabled selected value> -- select an option -- </option>
           <option value=1>1 aulas por semana </option>
           <option value=2>2 aulas por semana </option>
@@ -129,7 +148,7 @@
         <label>Promo</label>
       </div>
       <div class="column-right">
-        <select id="promo" name="promo">
+        <select id="promo" name="promo" onchange="updateFeeValue()">
           <option disabled selected value> -- select an option -- </option>
           <option value=1>No Promo</option>
           <option value=2>Half month</option>
@@ -173,7 +192,7 @@
     </div>
     <div class="space">
       <button class="form-button" type="submit">Update</button>
-      <button class="form-button" type="reset">Clear/Reset</button>
+      <button class="form-button" type="button" onclick="resetForms()">Clear/Reset</button>
     </div>
 
   </fieldset>
@@ -183,6 +202,54 @@
   resetForms = function () {
     document.getElementById("detail-form").reset();
     document.getElementById("search-form").reset();
+  }
+
+  updateFeeValue = function(){
+    let promo = document.getElementById("promo")
+    let subscription = document.getElementById("subscription-selectinput")
+
+    console.log(`${promo.value}, ${subscription.value}`)
+  }
+
+  callApi = function () {
+    var element = document.getElementById("selectbasic");
+    console.log(element.value);
+
+    fetch('/studentinfo', {
+      method: 'POST',
+      headers: new Headers({'Content-Type': 'application/x-www-form-urlencoded'}),
+      body: `studentid=${element.value}`
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data);
+
+        // update detail form
+        document.getElementById("detail-form").reset();
+        document.getElementById("studentId-field").value = data.Id;
+        document.getElementById("name-textinput").value = data.Name;
+        // document.getElementById("dob-textinput").value = data.Name;
+        document.getElementById("nif-textinput").value = data.Nif;
+        if (data.PhoneNumber.Valid) {
+          document.getElementById("phone-textinput").value = data.PhoneNumber.Int64;
+        }
+        if (data.Email.Valid) {
+          document.getElementById("email-textinput").value = data.Email.String;
+        }
+        document.getElementById("health-textinput").value = data.Health;
+        document.getElementById("year-textinput").value = data.Year;
+        // document.getElementById("subscription-selectinput").value = data.Name;
+        // document.getElementById("promo").value = data.Name;
+        if (data.Active) {
+          document.getElementById("active").checked = true;
+        } else {
+          document.getElementById("active").checked = false;
+        }
+        document.getElementById("fee-textinput").value = data.Fee;
+      });
+    
+    var test = document.getElementById("studentId-field");
+    console.log(test.value);
   }
 </script>
 
